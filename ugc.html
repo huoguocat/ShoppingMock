@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>用户评论页面</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; }
+    .comment { border: 1px solid #eee; padding: 10px; margin: 10px 0; border-radius: 5px; }
+    .btn { padding: 10px 20px; margin: 10px 0; cursor: pointer; }
+    .close-btn { position: absolute; top: 20px; right: 20px; }
+    .footer { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); text-align: center; }
+  </style>
+</head>
+<body>
+  <!-- 关闭评论页按钮 -->
+  <button class="btn close-btn" onclick="closeUgcPage()">× 关闭评论</button>
+
+  <!-- 评论区（根据分组加载高低质量评论） -->
+  <h2>用户评论</h2>
+  <div id="comment-list"></div>
+
+  <!-- 底部固定按钮 -->
+  <div class="footer">
+    <button class="btn" onclick="finishBrowse()">已经完成商品浏览，下一步去决定是否购买</button>
+  </div>
+
+  <script>
+    // 页面加载时：1. 开始计时 2. 加载对应质量的评论
+    window.onload = function() {
+      const data = JSON.parse(localStorage.getItem('experimentData'));
+      // 1. 记录评论页开始时间
+      data.ugcStartTime = Date.now();
+      localStorage.setItem('experimentData', JSON.stringify(data));
+      // 2. 获取分组参数，加载评论
+      const urlParams = new URLSearchParams(window.location.search);
+      const group = urlParams.get('group');
+      loadComments(group);
+    };
+
+    // 加载高低质量评论
+    function loadComments(group) {
+      const commentList = document.getElementById('comment-list');
+      // 高质量评论（信息丰富、逻辑清晰）
+      const highQualityComments = [
+        '<div class="comment"><h4>用户A</h4><p>购买了2周，实测4K拍摄画质很清晰，防水效果不错，浮潜10米内完全没问题。防抖功能在骑行时特别实用，画面不抖。电池续航大概2小时，配个备用电池足够一天使用。</p><p>评分：★★★★★</p></div>',
+        '<div class="comment"><h4>用户B</h4><p>对比了多款运动相机，这款性价比最高。操作界面简单，新手也能快速上手。配件齐全，包含头盔支架、防水壳，不用额外购买。唯一不足是夜间拍摄稍差，但白天完全够用。</p><p>评分：★★★★☆</p></div>'
+      ];
+      // 低质量评论（信息单薄、逻辑混乱）
+      const lowQualityComments = [
+        '<div class="comment"><h4>用户C</h4><p>还行吧，能用。</p><p>评分：★★★☆☆</p></div>',
+        '<div class="comment"><h4>用户D</h4><p>东西收到了，就这样，一般般。</p><p>评分：★★★☆☆</p></div>'
+      ];
+      // 根据分组渲染评论
+      if (group.includes('高UGC')) {
+        commentList.innerHTML = highQualityComments.join('');
+      } else {
+        commentList.innerHTML = lowQualityComments.join('');
+      }
+    }
+
+    // 关闭评论页：计算评论页停留时长，返回主图页
+    function closeUgcPage() {
+      const data = JSON.parse(localStorage.getItem('experimentData'));
+      const currentUgcTime = (Date.now() - data.ugcStartTime) / 1000;
+      data.tUgc += parseFloat(currentUgcTime.toFixed(2));
+      delete data.ugcStartTime; // 清除评论页开始时间
+      localStorage.setItem('experimentData', JSON.stringify(data));
+      window.location.href = 'product.html';
+    }
+
+    // 完成浏览：计算最终评论页时长，跳转到结果页
+    function finishBrowse() {
+      const data = JSON.parse(localStorage.getItem('experimentData'));
+      const currentUgcTime = (Date.now() - data.ugcStartTime) / 1000;
+      data.tUgc += parseFloat(currentUgcTime.toFixed(2));
+      localStorage.setItem('experimentData', JSON.stringify(data));
+      window.location.href = 'result.html';
+    }
+  </script>
+</body>
+</html>
