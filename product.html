@@ -2,30 +2,379 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>商品浏览页面</title>
+  <title>哔哩哔哩 小电视樱花 毛绒抱枕 - 商品详情</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; }
-    #ai-tag { color: red; display: none; /* 默认隐藏AI标签，随机分组后显示 */ }
-    .btn { padding: 10px 20px; margin: 10px 0; cursor: pointer; }
-    .footer { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); text-align: center; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      color: #333;
+    }
+    #ai-tag {
+      color: #ff6666;
+      background: #fff0f0;
+      padding: 8px 12px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      display: none;
+    }
+    .product-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+    .product-media {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .product-video {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #000;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .product-video video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .thumbnails {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 5px 0;
+    }
+    .thumbnails img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 2px solid transparent;
+    }
+    .thumbnails img.active {
+      border-color: #fb7299;
+    }
+    .product-info h1 {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .price {
+      font-size: 28px;
+      color: #ff6666;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+    .price small {
+      font-size: 16px;
+      color: #999;
+    }
+    .service-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .service-tag {
+      font-size: 13px;
+      color: #666;
+      background: #f5f5f5;
+      padding: 4px 10px;
+      border-radius: 4px;
+    }
+    .member-tag {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f8f8f8;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+    .member-tag img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+    .qrcode-box {
+      margin-bottom: 20px;
+    }
+    .qrcode-box img {
+      width: 160px;
+      height: 160px;
+    }
+    .qrcode-box p {
+      font-size: 13px;
+      color: #666;
+      margin-top: 5px;
+    }
+    .section {
+      margin-bottom: 40px;
+    }
+    .section h2 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #f5f5f5;
+    }
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .spec-table td {
+      padding: 10px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .spec-table td:first-child {
+      color: #666;
+      width: 120px;
+    }
+    .selling-points {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+    .point-card {
+      background: #fafafa;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .point-card h3 {
+      font-size: 16px;
+      margin-bottom: 8px;
+      color: #fb7299;
+    }
+    .point-card p {
+      font-size: 13px;
+      color: #666;
+    }
+    .scene-gallery {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .scene-gallery img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+    .trust-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #666;
+    }
+    .badge::before {
+      content: "✓";
+      color: #52c41a;
+      font-weight: bold;
+    }
+    .faq-item {
+      margin-bottom: 15px;
+    }
+    .faq-question {
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: #333;
+    }
+    .faq-answer {
+      font-size: 14px;
+      color: #666;
+      padding-left: 10px;
+    }
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: #fb7299;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #ff85ad;
+    }
+    .btn-secondary {
+      background: #f5f5f5;
+      color: #333;
+    }
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .footer {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
   </style>
 </head>
 <body>
-  <!-- AI标签（根据分组显示/隐藏） -->
+  <!-- AI标签 -->
   <div id="ai-tag">⚠️ 本商品图片由AI生成</div>
-  
-  <!-- 商品信息 -->
-  <h1>运动相机 X100</h1>
-  <img src="https://picsum.photos/800/400" alt="商品主图" style="width: 100%;">
-  <p>价格：¥1299</p>
-  <p>功能：4K超清拍摄、防水、防抖</p>
 
-  <!-- 查看评论按钮 -->
-  <button class="btn" onclick="goToUgcPage()">查看用户评论</button>
+  <!-- 商品主容器 -->
+  <div class="product-container">
+    <!-- 左侧：商品媒体区 -->
+    <div class="product-media">
+      <div class="product-video">
+        <video controls poster="https://picsum.photos/800/450?random=1">
+          <source src="#" type="video/mp4">
+          您的浏览器不支持视频播放
+        </video>
+      </div>
+      <div class="thumbnails">
+        <img src="https://picsum.photos/80/80?random=1" class="active" alt="主图">
+        <img src="https://picsum.photos/80/80?random=2" alt="细节图">
+        <img src="https://picsum.photos/80/80?random=3" alt="场景图">
+        <img src="https://picsum.photos/80/80?random=4" alt="使用图">
+        <img src="https://picsum.photos/80/80?random=5" alt="对比图">
+      </div>
+    </div>
+
+    <!-- 右侧：商品信息区 -->
+    <div class="product-info">
+      <h1>哔哩哔哩 小电视樱花 毛绒抱枕</h1>
+      <div class="price">¥39 <small>起</small></div>
+      
+      <div class="service-tags">
+        <span class="service-tag">专业包装</span>
+        <span class="service-tag">满129包邮</span>
+        <span class="service-tag">支持7天无理由</span>
+        <span class="service-tag">48h内发货</span>
+      </div>
+
+      <div class="member-tag">
+        <img src="https://picsum.photos/40/40?random=member" alt="会员购">
+        <span>哔哩哔哩会员购</span>
+      </div>
+
+      <div class="qrcode-box">
+        <img src="https://picsum.photos/160/160?random=qrcode" alt="购买二维码">
+        <p>使用哔哩哔哩APP扫码购买</p>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn btn-secondary" onclick="goToUgcPage()">查看用户评论</button>
+        <button class="btn btn-primary" onclick="finishBrowse()">立即购买</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 核心卖点区 -->
+  <div class="section">
+    <h2>✨ 核心卖点</h2>
+    <div class="selling-points">
+      <div class="point-card">
+        <h3>樱花限定设计</h3>
+        <p>粉白渐变+小电视经典造型，还原春日浪漫氛围</p>
+      </div>
+      <div class="point-card">
+        <h3>亲肤柔软面料</h3>
+        <p>精选聚酯纤维填充，蓬松回弹，抱睡解压</p>
+      </div>
+      <div class="point-card">
+        <h3>多尺寸可选</h3>
+        <p>大号抱枕/mini挂件，满足桌面、床头、随身多种场景</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 详细参数区 -->
+  <div class="section">
+    <h2>📏 规格参数</h2>
+    <table class="spec-table">
+      <tr>
+        <td>面料</td>
+        <td>涤纶</td>
+        <td>填充物</td>
+        <td>聚酯纤维</td>
+      </tr>
+      <tr>
+        <td>尺寸</td>
+        <td colspan="3">
+          常规：150mm×190mm×178mm<br>
+          mini：95mm×88mm×40mm（不含挂链）
+        </td>
+      </tr>
+      <tr>
+        <td>官方价</td>
+        <td colspan="3">39/69/109元（不同规格）</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- 场景展示区 -->
+  <div class="section">
+    <h2>📸 场景展示</h2>
+    <div class="scene-gallery">
+      <img src="https://picsum.photos/400/300?random=scene1" alt="卧室场景">
+      <img src="https://picsum.photos/400/300?random=scene2" alt="桌面场景">
+      <img src="https://picsum.photos/400/300?random=scene3" alt="沙发场景">
+      <img src="https://picsum.photos/400/300?random=scene4" alt="细节特写">
+    </div>
+  </div>
+
+  <!-- 信任背书区 -->
+  <div class="section">
+    <h2>🛡️ 售后保障</h2>
+    <div class="trust-badges">
+      <div class="badge">7天无理由退换（不影响二次销售）</div>
+      <div class="badge">官方正品授权，支持防伪验证</div>
+      <div class="badge">48小时极速发货，节假日顺延</div>
+      <div class="badge">会员购专属客服，1v1售后跟进</div>
+    </div>
+  </div>
+
+  <!-- FAQ区 -->
+  <div class="section">
+    <h2>❓ 常见问题</h2>
+    <div class="faq-item">
+      <div class="faq-question">Q：抱枕清洗需要注意什么？</div>
+      <div class="faq-answer">A：建议手洗或轻柔机洗，水温不超过30℃，避免长时间浸泡和暴晒。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question">Q：mini款是否带挂链？</div>
+      <div class="faq-answer">A：mini款不含挂链，可自行搭配钥匙扣或挂绳。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question">Q：满多少包邮？</div>
+      <div class="faq-answer">A：单笔订单满129元即可享受包邮服务（偏远地区除外）。</div>
+    </div>
+  </div>
 
   <!-- 底部固定按钮 -->
   <div class="footer">
-    <button class="btn" onclick="finishBrowse()">已经完成商品浏览，下一步去决定是否购买</button>
+    <button class="btn btn-primary" onclick="finishBrowse()">已经完成商品浏览，下一步去决定是否购买</button>
   </div>
 
   <script>
