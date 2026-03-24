@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>商品浏览页面</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; }
+    #ai-tag { color: red; display: none; /* 默认隐藏AI标签，随机分组后显示 */ }
+    .btn { padding: 10px 20px; margin: 10px 0; cursor: pointer; }
+    .footer { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); text-align: center; }
+  </style>
+</head>
+<body>
+  <!-- AI标签（根据分组显示/隐藏） -->
+  <div id="ai-tag">⚠️ 本商品图片由AI生成</div>
+  
+  <!-- 商品信息 -->
+  <h1>运动相机 X100</h1>
+  <img src="https://picsum.photos/800/400" alt="商品主图" style="width: 100%;">
+  <p>价格：¥1299</p>
+  <p>功能：4K超清拍摄、防水、防抖</p>
+
+  <!-- 查看评论按钮 -->
+  <button class="btn" onclick="goToUgcPage()">查看用户评论</button>
+
+  <!-- 底部固定按钮 -->
+  <div class="footer">
+    <button class="btn" onclick="finishBrowse()">已经完成商品浏览，下一步去决定是否购买</button>
+  </div>
+
+  <script>
+    // 全局变量：存储计时数据（用localStorage持久化，防止页面跳转丢失）
+    if (!localStorage.getItem('experimentData')) {
+      // 初始化数据（首次进入页面）
+      localStorage.setItem('experimentData', JSON.stringify({
+        group: '', // 随机分组结果
+        tAd: 0,    // 主图页总停留时长（秒）
+        tUgc: 0,   // 评论页总停留时长（秒）
+        adStartTime: Date.now() // 主图页本次开始时间
+      }));
+    }
+
+    // 页面加载时执行：1. 随机分组 2. 开始计时
+    window.onload = function() {
+      const data = JSON.parse(localStorage.getItem('experimentData'));
+      // 1. 随机分组（2×2：有无AI × UGC质量高低）
+      if (!data.group) {
+        const groups = ['AI_高UGC', 'AI_低UGC', '无AI_高UGC', '无AI_低UGC'];
+        data.group = groups[Math.floor(Math.random() * 4)];
+        localStorage.setItem('experimentData', JSON.stringify(data));
+        // 根据分组显示/隐藏AI标签
+        if (data.group.includes('AI')) {
+          document.getElementById('ai-tag').style.display = 'block';
+        }
+      }
+      // 2. 重置主图页开始时间（每次回到主图页都重新计时）
+      data.adStartTime = Date.now();
+      localStorage.setItem('experimentData', JSON.stringify(data));
+      console.log('当前分组：', data.group);
+    };
+
+    // 跳转到评论页：先计算本次主图页停留时长，再跳转
+    function goToUgcPage() {
+      const data = JSON.parse(localStorage.getItem('experimentData'));
+      // 计算本次主图页停留时长（秒，保留2位小数）
+      const currentAdTime = (Date.now() - data.adStartTime) / 1000;
+      data.tAd += parseFloat(currentAdTime.toFixed(2));
+      localStorage.setItem('experimentData', JSON.stringify(data));
+      // 跳转到评论页（带分组参数）
+      window.location.href = `ugc.html?group=${data.group}`;
+    }
+
+    // 完成浏览：计算最终主图页时长，跳转到结果页
+    function finishBrowse() {
+      const data = JSON.parse(localStorage.getItem('experimentData'));
+      const currentAdTime = (Date.now() - data.adStartTime) / 1000;
+      data.tAd += parseFloat(currentAdTime.toFixed(2));
+      localStorage.setItem('experimentData', JSON.stringify(data));
+      // 跳转到结果展示页
+      window.location.href = 'result.html';
+    }
+  </script>
+</body>
+</html>
